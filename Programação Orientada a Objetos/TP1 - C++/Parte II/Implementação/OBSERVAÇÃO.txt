@@ -1,0 +1,1 @@
+Gostaria de ressaltar que tentamos de varias formas executar o programa a partir de um arquivo de texto de entrada, mas não foi possivel.

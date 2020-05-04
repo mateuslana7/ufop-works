@@ -1,0 +1,148 @@
+package parse;
+
+import absyn.*;
+import error.ErrorHelper;
+import io.vavr.collection.List;
+import java_cup.runtime.Symbol;
+import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
+import java_cup.runtime.ComplexSymbolFactory.Location;
+
+parser code {:
+  public Parser(Lexer lex) {
+     this(lex, lex.getSymbolFactory());
+  }
+
+  private Loc loc(Location left, Location right) {
+     return Loc.loc(left, right);
+  }
+
+  /* override error routines */
+  private Loc locOfInfo(Object info) {
+     return info instanceof ComplexSymbol ?
+               Loc.loc((ComplexSymbol) info) :
+               info instanceof Symbol ?
+                  Loc.loc((Symbol) info) :
+                  Loc.loc(cur_token);
+  }
+
+  private String lexemeOfInfo(Object info) {
+     return info instanceof ComplexSymbol ?
+               " at '" + ((ComplexSymbol) info).getName() + "'" :
+               "";
+
+  }
+
+  public void report_fatal_error(String message, Object info) {
+     done_parsing();
+     throw ErrorHelper.error(locOfInfo(info),
+                             "%s%s%nCan't recover from previous error(s), giving up.",
+                             message,
+                             lexemeOfInfo(info));
+  }
+
+  public void report_error(String message, Object info) {
+     throw ErrorHelper.error(locOfInfo(info),
+                             "%s%s",
+                             message,
+                             lexemeOfInfo(info));
+  }
+:};
+
+terminal String LITINT;
+terminal String LITBOOL;
+terminal String LITTEXT;
+terminal String LITREAL;
+terminal String LITVOID;
+terminal String ID;
+terminal ASSIGN,NIL;
+terminal        PLUS, MINUS, TIMES, DIV, POWER;
+terminal        EQ, NE, LT, LE, GT, GE;
+terminal        AND, OR;
+terminal        LPAREN, RPAREN, COMMA;
+terminal        BOOL, INT,REAL,VOID,TEXT;
+terminal        IF, THEN, ELSE;
+terminal        WHILE,DO;
+terminal        LET, IN;
+
+
+non terminal Program      program;
+non terminal Exp          exp;
+non terminal List<Exp>    exps;
+non terminal Ty           type;
+non terminal TypeId       typeid;
+non terminal List<TypeId> typeids;
+non terminal Fun          fun;
+non terminal List<Fun>    funs;
+
+precedence left     OR;
+precedence left     AND;
+precedence nonassoc EQ, NE, LT, LE, GT, GE;
+precedence left     PLUS, MINUS;
+precedence left     TIMES, DIV;
+precedence right    POWER;
+
+start with program;
+
+program ::=
+  funs:fs {: RESULT = new Program(loc(fsxleft, fsxright), fs); :}
+;
+
+exp ::=
+  LITINT:cte                       {: RESULT = new ExpInt(loc(ctexleft, ctexright), cte); :}
+| LITBOOL:cte                      {: RESULT = new ExpBool(loc(ctexleft, ctexright), cte); :}
+| LITTEXT:cte                      {: RESULT = new ExpText(loc(ctexleft, ctexright), cte); :}
+| LITREAL:cte                      {: RESULT = new ExpReal(loc(ctexleft, ctexright), cte); :}
+| ID:n                             {: RESULT = new ExpVar(loc(nxleft, nxright), n); :}
+| exp:x PLUS exp:y                 {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.PLUS, x, y); :}
+| exp:x MINUS exp:y                {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.MINUS, x, y); :}
+| exp:x TIMES exp:y                {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.TIMES, x, y); :}
+| exp:x DIV exp:y                  {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.DIV, x, y); :}
+| exp:x POWER exp:y                {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.POWER, x, y); :}
+| exp:x EQ exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.EQ, x, y); :}
+| exp:x NE exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.NE, x, y); :}
+| exp:x LT exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.LT, x, y); :}
+| exp:x LE exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.LE, x, y); :}
+| exp:x GT exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.GT, x, y); :}
+| exp:x GE exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.GE, x, y); :}
+| exp:x AND exp:y                  {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.AND, x, y); :}
+| exp:x OR exp:y                   {: RESULT = new ExpBin(loc(xxleft, yxright), BinOp.OR, x, y); :}
+| LPAREN:l exps:s RPAREN:r         {: RESULT = new ExpSequence(loc(lxleft,rxright), s); :}
+| LET:l ID:v EQ exp:i IN exp:b     {: RESULT = new ExpLet(loc(lxleft, bxright), v, i, b); :}
+| IF:i exp:t THEN exp:a ELSE exp:b {: RESULT = new ExpIf(loc(ixleft, bxright), t, a, b); :}
+| ID:f LPAREN exps:args RPAREN:r   {: RESULT = new ExpCall(loc(fxleft, rxright), f, args); :}
+| ID:v ASSIGN exp:e                {: RESULT = new ExpAssign(loc(vxleft,exright), v, e); :}
+| WHILE:w exp:t DO exp:b           {: RESULT = new ExpWhile(loc(wxleft,bxright), t, b); :}
+
+;
+exps ::=
+  /* empty */         {: RESULT = List.empty(); :}
+|  exp:x              {: RESULT = List.of(x); :}
+| exp:x COMMA exps:xs {: RESULT = xs.prepend(x); :}
+;
+        
+fun ::=
+  typeid:n LPAREN typeids:ps RPAREN EQ exp:b               {: RESULT = new Fun(loc(nxleft, bxright), n, ps, b); :}
+;
+
+type ::=
+  INT:t  {: RESULT = new TyInt(loc(txleft, txright)); :}
+| BOOL:t {: RESULT = new TyBool(loc(txleft, txright)); :}
+| TEXT:t {: RESULT = new TyText(loc(txleft, txright)); :}
+| REAL:t {: RESULT = new TyReal(loc(txleft, txright)); :}
+| VOID:t {: RESULT = new TyVoid(loc(txleft, txright)); :}
+;
+
+typeid ::=
+  type:t ID:x  {: RESULT = new TypeId(loc(txleft, xxright), t, x); :}
+;
+
+typeids ::=
+   /* empty */             {: RESULT = List.empty(); :}
+| typeid:x                  {: RESULT = List.of(x); :}
+| typeid:x COMMA typeids:xs {: RESULT = xs.prepend(x); :}
+;
+
+funs ::=
+  fun:x         {: RESULT = List.of(x); :}
+| fun:x funs:xs {: RESULT = xs.prepend(x); :}
+;

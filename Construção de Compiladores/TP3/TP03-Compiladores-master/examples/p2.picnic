@@ -1,0 +1,19 @@
+bool test(int x, int y) = x < y
+
+int main(int argc, bool found) =
+  if test(3, 54) then
+    let r = 4
+    in let pi = 3
+      in 2 + pi + r
+  else
+    0
+
+bool test(int x, int y) = x < y
+
+int main() =
+  if test(3, 54) then
+    let r = 4
+    in let pi = 3
+      in 2 + pi + r
+  else
+    0

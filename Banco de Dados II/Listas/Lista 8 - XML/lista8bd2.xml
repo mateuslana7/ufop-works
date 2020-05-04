@@ -1,0 +1,63 @@
+<!--
+	Lista 8 - Bancos de Dados II(BCC441)
+	Alunos: Mateus Lana e Thiago Santana
+	Matriculas: 15.1.4340 e 15.1.4313
+-->
+
+<!DOCTYPE db [
+	<!ELEMENT db (empregado*, departamento*)>
+	<!ELEMENT empregado(nome,salario,sexo,numDepto,numSuperv)>
+	<!ELEMENT departamento(nomeDepto,gerente)>
+	<!ELEMENT codigo(#PCDATA)>
+	<!ELEMENT nome(#PCDATA)>
+	<!ELEMENT salario(#PCDATA)>
+	<!ELEMENT sexo(#PCDATA)>
+	<!ELEMENT numDepto(#PCDATA)>
+	<!ELEMENT numSuperv(#PCDATA)>
+	<!ELEMENT numero(#PCDATA)>
+	<!ELEMENT nomeDepto(#PCDATA)>
+	<!ELEMENT gerente(#PCDATA)>
+	<ATTLIST departamento idDepto ID #REQUIRED>
+	<ATTLIST empregado id ID #REQUIRED>
+	<ATTLIST numDepto iddepto IDREF #REQUIRED>
+	<ATTLIST numSuperv idsuperv IDREF #IMPLIED>
+	<ATTLIST gerente idgerente IDREF #REQUIRED>
+]>
+
+<empregado id = "e1">
+	<codigo>1</codigo>
+	<nome>Ana</nome>
+	<salario>4500</salario>
+	<sexo>F</sexo>
+	<numDepto>2</numDepto>
+	<numSuperv idsuperv = "e3">
+</empregado>
+
+<empregado id = "e2">
+	<codigo>2</codigo>
+	<nome>Carlos</nome>
+	<salario>3500</salario>
+	<sexo>M</sexo>
+	<numDepto>2</numDepto>
+	<numSuperv idsuperv = "e3">
+</empregado>
+
+<empregado id = "e3">
+	<codigo>3</codigo>
+	<nome>Maria</nome>
+	<salario>5500</salario>
+	<sexo>F</sexo>
+	<numDepto>1</numDepto>
+</empregado>
+
+<departamento idDepto = "d1">
+	<numero>1</numero>
+	<nomeDepto>Administração</nomeDepto>
+	<gerente idgerente = "e3">
+</departamento>
+
+<departamento idDepto = "d2">
+	<numero>2</numero>
+	<nomeDepto>Computação</nomeDepto>
+	<gerente idgerente = "e1">
+</departamento>

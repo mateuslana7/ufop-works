@@ -1,0 +1,27 @@
+
+REGRAS 
+
+1- Um jogador possui uma movimentacao por vez, exceto em caso de: 
+um jogador A 'comer' a pedra do jogador B e tiver a chance de
+comer novamente, sendo assim o jogador A sera questionado se 
+ele quer jogar novamente.
+
+2- Jogadores nao podem movimentar pecas para tras, exceto em caso
+da peca a ser movimentada ser do tipo Dama.
+ 
+3- Uma peca do tipo Dama e aquela que atravessou o tabuleiro, ou seja,
+saiu da posicao de origem e alcancou a borda de origem do oponente mais 
+proxima. A formacao de dama ocorre somente uma vez por peca.
+ 
+4- A peca Dama pode andar somente uma unica casa por vez. 
+
+5- A formacao do tabuleiro corresponde a uma matriz onde as intersecoes 
+de linhas e colunas sao chamadas de casa. Nem todas as casas do tabuleiro 
+estao aptas a receber uma peca. Define-se casa caminhavel aquela que pode 
+receber pecas e nao caminhavel aquela que nao pode receber pecas.  
+Uma casa caminhavel nao pode ter seus vizinhos da esquerda, direita, 
+de cima e de baixo caminhaveis. Isso significa que o jogador pode movimentar
+pecas apenas na diagonal.
+ 
+6- A primeira casa de uma linha impar do tabuleiro eh caminhavel e a primeira
+casa de uma linha par do tabuleiro nao eh caminhavel. 

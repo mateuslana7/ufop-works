@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<h1>Log in</h1>
+<!--<form class="site-form" action="index.html" method="post">-->
+<form class="site-form" action="{% url 'accounts:login' %}" method="post">
+	{% csrf_token %}
+	{{form}}
+	<input type="submit" value="Login">
+
+	</input>
+
+</form>
+<!--<a href="#intro" class="scrollto"><img src="/img/logo2.png"  alt="" title=""></a>-->
+{% endblock %}

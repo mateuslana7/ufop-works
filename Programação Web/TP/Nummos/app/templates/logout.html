@@ -1,0 +1,18 @@
+<!-- 
+  Página com mensagem de despedida e um link para fazer login novamente
+-->
+{% extends 'base.html' %} {% block content %} {%load static %}
+<div class="h-100">
+    <div class="d-flex justify-content-center h-100">
+        <div class="login-card">
+            <div class="d-flex justify-content-center">
+                <div class="logo-container">
+                    <img src="{% static 'tasks/logo.jpg' %}" class="logo" alt="Nosso lar">
+                </div>
+            </div>
+            <p class="lead text-center">Volte sempre! </p>
+            <a type="button " name="button " class="btn login-btn" href="{% url 'login' %}">Faça login</a>
+        </div>
+    </div>
+</div>
+{% endblock content%}
