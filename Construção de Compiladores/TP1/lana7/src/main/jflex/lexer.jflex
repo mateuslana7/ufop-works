@@ -82,75 +82,47 @@ import java_cup.runtime.ComplexSymbolFactory;
 %state COMMENT
 %state STR
 
-litint    = [0-9]+
-id        = [a-zA-Z][a-zA-Z0-9_]*
+litint    = [0-9]+ //ER QUE DEFINE OS LITERAIS INTEIROS
+id        = [a-zA-Z][a-zA-Z0-9_]* // ER QUE DEFINE OS IDENTIFICADORES
 
 %%
 
 <YYINITIAL>{
-[ \t\f\n\r]+ { /* skip */ }
-"#" .*       { /* skip */ }
-"{#"         { yybegin(COMMENT); commentLevel = 1; }
+[ \t\f\n\r]+ { /* IGNORA */ }
+"--" .*       { /* IGNORA */ }
+"/-"         { yybegin(COMMENT); commentLevel = 1; }
 
-true         { return tok(LITBOOL, true); }
-false        { return tok(LITBOOL, false); }
-{litint}     { return tok(LITINT, yytext()); }
-\"           { builder.setLength(0); strLeft = locLeft(); yybegin(STR); }
+//CLASSIFICACAO DOS LITERAIS INTEIROS
+{litint}     { return tok(LIT_INTEIRO, yytext()); }
 
-bool         { return tok(BOOL); }
-int          { return tok(INT); }
-string       { return tok(STRING); }
+//CLASSIFICACAO DAS PALAVRAS RESERVADAS
+bool         { return tok(BOOLEANO); }
+int          { return tok(INTEIRO); }
 if           { return tok(IF); }
 then         { return tok(THEN); }
 else         { return tok(ELSE); }
-while        { return tok(WHILE); }
-do           { return tok(DO); }
 let          { return tok(LET); }
 in           { return tok(IN); }
 
+//CLASSIFICACAO DOS IDENTIFICADORES
 {id}         { return tok(ID, yytext().intern()); }
 
-":="         { return tok(ASSIGN); }
-"+"          { return tok(PLUS); }
-"-"          { return tok(MINUS); }
-"*"          { return tok(TIMES); }
-"/"          { return tok(DIV); }
-"%"          { return tok(MOD); }
-"="          { return tok(EQ); }
-"<>"         { return tok(NE); }
-"<"          { return tok(LT); }
-"<="         { return tok(LE); }
-">"          { return tok(GT); }
-">="         { return tok(GE); }
-"&&"         { return tok(AND); }
-"||"         { return tok(OR); }
-"&&"         { return tok(AND); }
-"("          { return tok(LPAREN); }
-")"          { return tok(RPAREN); }
-","          { return tok(COMMA); }
+//CLASSIFICACAO DOS OPERADORES
+"+"          { return tok(MAIS); }
+"="          { return tok(IGUAL); }
+
+//CLASSIFICACAO DOS SINAIS DE PONTUACAO
+"("          { return tok(PARENTESE_ESQ); }
+")"          { return tok(PARENTESE_DIR); }
+","          { return tok(VIRGULA); }
 }
 
+//TRATAMENTO DOS COMENTARIOS DE BLOCOS E BLOCOS ANINHADOS
 <COMMENT>{
-"{#"         { ++commentLevel; }
-"#}"         { if (--commentLevel == 0) yybegin(YYINITIAL); }
+"/-"         { ++commentLevel; }
+"-/"         { if (--commentLevel == 0) yybegin(YYINITIAL); }
 [^]          { }
 <<EOF>>      { yybegin(YYINITIAL); error("unclosed comment"); }
-}
-
-<STR>{
-\"           { yybegin(YYINITIAL); return tok(LITSTRING, builder.toString(), strLeft, locRight()); }
-\\ b         { builder.append('\b'); }
-\\ t         { builder.append('\t'); }
-\\ n         { builder.append('\n'); }
-\\ r         { builder.append('\r'); }
-\\ f         { builder.append('\f'); }
-\\ \\        { builder.append('\\'); }
-\\ \"        { builder.append('"'); }
-\\ [0-9]{3}  { builder.append((char)(Integer.parseInt(yytext().substring(1)))); }
-\\ .         { error("invalid escape sequence in string literal"); }
-[^\"\n\\]+   { builder.append(yytext()); }
-\n           { error("invalid newline in string literal"); }
-<<EOF>>      { yybegin(YYINITIAL); error("unclosed string literal"); }
 }
 
 .            { error("invalid character '%s'", yytext()); }

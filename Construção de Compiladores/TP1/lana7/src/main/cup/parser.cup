@@ -1,0 +1,16 @@
+package parse;
+
+terminal String LIT_INTEIRO;
+terminal String ID;
+terminal        MAIS;
+terminal        IGUAL;
+terminal        PARENTESE_ESQ, PARENTESE_DIR, VIRGULA;
+terminal        BOOLEANO, INTEIRO;
+terminal        IF, THEN, ELSE;
+terminal        LET, IN;
+
+non terminal program;
+
+start with program;
+
+program ::= ;

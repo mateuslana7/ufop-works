@@ -5,12 +5,12 @@
    <modelVersion>4.0.0</modelVersion>
 
    <groupId>br.ufop.decom.bcc328</groupId>
-   <artifactId>torben</artifactId>
-   <version>0.1-SNAPSHOT</version>
+   <artifactId>lana7</artifactId>
+   <version>1.0</version>
    <packaging>jar</packaging>
 
-   <name>Torben compiler</name>
-   <url>https://github.com/romildo/torben-java</url>
+   <name>Lana7 compiler</name>
+   <url>https://github.com/mateuslana7/TP01-Compiladores</url>
 
    <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
